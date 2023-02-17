@@ -1,0 +1,9 @@
+# macOS specific
+.DS_Store
+
+# Go specific
+/bin/
+/pkg/
+/vendor/
+/go.sum
+/go.mod
