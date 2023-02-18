@@ -33,24 +33,29 @@ func main() {
     tempParagraph := widgets.NewParagraph()
     tempParagraph.Title = "Temperatura"
     tempParagraph.Text = " Aguardando dados..."
-    tempParagraph.SetRect(0, 0, 25, 3)
+    tempParagraph.SetRect(0, 0, 29, 3)
 
     humParagraph := widgets.NewParagraph()
     humParagraph.Title = "Umidade"
     humParagraph.Text = " Aguardando dados..."
-    humParagraph.SetRect(0, 3, 25, 6)
+    humParagraph.SetRect(0, 3, 29, 6)
 
     // Create a paragraph widget to display the LED status
     ledParagraph := widgets.NewParagraph()
     ledParagraph.Title = "LED"
     ledParagraph.Text = " Desligado"
-    ledParagraph.SetRect(0, 6, 25, 9)
+    ledParagraph.SetRect(0, 6, 29, 9)
+
+    // Create a paragraph widget to display the keyboard events
+    keyParagraph := widgets.NewParagraph()
+    keyParagraph.Text = " Quit with 'q' or 'Ctrl-C'"
+    keyParagraph.SetRect(0, 9, 29, 12)
 
     // Initialize the user interface
     ui.Init()
     defer ui.Close()
 
-    ui.Render(tempParagraph, humParagraph)
+    ui.Render(tempParagraph, humParagraph, ledParagraph, keyParagraph)
 
     // Publish "1" and "0" messages to the "topic_on_off_led" topic, with a 5-second interval
     go func() {
@@ -79,7 +84,7 @@ func main() {
         ui.Render(humParagraph)
     })
 
-    // Handle mouse and keyboard events
+    // Handle keyboard events
     uiEvents := ui.PollEvents()
 
     for {
