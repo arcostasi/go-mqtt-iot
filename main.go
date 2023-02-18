@@ -5,6 +5,8 @@ import (
     "time"
 
     MQTT "github.com/eclipse/paho.mqtt.golang"
+    ui "github.com/gizak/termui/v3"
+    "github.com/gizak/termui/v3/widgets"
 )
 
 const (
@@ -27,33 +29,65 @@ func main() {
     // Print a message when the client is connected
     fmt.Println("Connected to broker.hivemq.com")
 
+    // Create temperature and humidity widgets
+    tempParagraph := widgets.NewParagraph()
+    tempParagraph.Title = "Temperatura"
+    tempParagraph.Text = " Aguardando dados..."
+    tempParagraph.SetRect(0, 0, 25, 3)
+
+    humParagraph := widgets.NewParagraph()
+    humParagraph.Title = "Umidade"
+    humParagraph.Text = " Aguardando dados..."
+    humParagraph.SetRect(0, 3, 25, 6)
+
+    // Create a paragraph widget to display the LED status
+    ledParagraph := widgets.NewParagraph()
+    ledParagraph.Title = "LED"
+    ledParagraph.Text = " Desligado"
+    ledParagraph.SetRect(0, 6, 25, 9)
+
+    // Initialize the user interface
+    ui.Init()
+    defer ui.Close()
+
+    ui.Render(tempParagraph, humParagraph)
+
     // Publish "1" and "0" messages to the "topic_on_off_led" topic, with a 5-second interval
     go func() {
         for {
             client.Publish(TOPIC_ON_OFF_LED, 0, false, "1")
-            fmt.Println("LED ligado")
+            ledParagraph.Text = " Ligado"
+            ui.Render(ledParagraph)
             time.Sleep(5 * time.Second)
 
             client.Publish(TOPIC_ON_OFF_LED, 0, false, "0")
-            fmt.Println("LED desligado")
+            ledParagraph.Text = " Desligado"
+            ui.Render(ledParagraph)
             time.Sleep(5 * time.Second)
         }
     }()
 
-    // Subscribe to the "topic_sensor_temperature" topic and print received messages to the console
-    go func() {
-        client.Subscribe(TOPIC_PUBLISH_TEMPERATURE, 0, func(client MQTT.Client, msg MQTT.Message) {
-            fmt.Printf("Temperatura: %s\n", string(msg.Payload()))
-        })
-    }()
+    // Subscribe to the "topic_sensor_temperature" topic and update the temperature widget
+    client.Subscribe(TOPIC_PUBLISH_TEMPERATURE, 0, func(client MQTT.Client, msg MQTT.Message) {
+        tempParagraph.Text = fmt.Sprintf(" %s", string(msg.Payload()))
+        ui.Render(tempParagraph)
+    })
 
-    // Subscribe to the "topic_sensor_humidity" topic and print received messages to the console
-    go func() {
-        client.Subscribe(TOPIC_PUBLISH_HUMIDITY, 0, func(client MQTT.Client, msg MQTT.Message) {
-            fmt.Printf("Humidade: %s\n", string(msg.Payload()))
-        })
-    }()
+    // Subscribe to the "topic_sensor_humidity" topic and update the humidity widget
+    client.Subscribe(TOPIC_PUBLISH_HUMIDITY, 0, func(client MQTT.Client, msg MQTT.Message) {
+        humParagraph.Text = fmt.Sprintf(" %s", string(msg.Payload()))
+        ui.Render(humParagraph)
+    })
 
-    // Wait for events to occur (infinite loop)
-    select {}
+    // Handle mouse and keyboard events
+    uiEvents := ui.PollEvents()
+
+    for {
+        e := <-uiEvents
+        switch e.ID {
+        case "q", "<C-c>":
+            // Quit the program when the user presses 'q' or 'Ctrl-C'
+            return
+        }
+    }
 }
