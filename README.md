@@ -65,18 +65,23 @@ $ go run cmd/main.go
 6. The application will start running and you should see output in the console indicating that the LED is turning on and off and that temperature and humidity data is being received from the DHT22 sensor.
 
 ```shell
-Connected to broker.hivemq.com
-LED ligado
-Temperatura: 25.6
-Humidade: 56.3
-LED desligado
-Temperatura: 25.6
-Humidade: 56.3
++-Temperatura---------------+
+| 15.90C                    |
++---------------------------+
++-Temperatura---------------+
+| 54.50C                    |
++---------------------------+
++-LED-----------------------+
+| Ligado                    |
++---------------------------+
++---------------------------+
+| Quit with 'q' or 'Ctrl-C' |
++---------------------------+
 ```
 
 You can stop the application by pressing `Ctrl + C`.
 
-7. To run the Wokwi simulation, open the `https://wokwi.com/projects/322524997423727188` file in a web browser.
+7. To run the Wokwi simulation, open the [project](https://wokwi.com/projects/322524997423727188) file in a web browser.
 
 The Wokwi simulation should now load in the web browser and you can interact with the circuit as desired.
 
